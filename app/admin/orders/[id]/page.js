@@ -1,0 +1,13 @@
+"use client";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import { useAdmin } from "../../../../components/admin-context";
+import { PageHeading, StatusBadge } from "../../../../components/ui";
+
+export default function OrderDetailPage() {
+  const params = useParams();
+  const {orders} = useAdmin();
+  const order = orders.find(o => o.id.replace("#","") === String(params.id).replace("#","") || o.id === `#${params.id}`);
+  if (!order) return <div className="rounded-2xl border border-stone-200 bg-white p-10 text-center"><h2 className="text-xl font-bold">Order not found</h2><Link href="/admin/orders" className="mt-4 inline-block text-sm font-semibold text-brand">Back to orders</Link></div>;
+  return <div><PageHeading eyebrow="ORDER DETAILS" title={`Order ${order.id}`} description={`Placed on ${order.date}`} secondary={<Link href="/admin/orders" className="rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-semibold">Back to orders</Link>}/><div className="grid gap-5 lg:grid-cols-[1fr_320px]"><section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-soft"><h3 className="font-bold">Order items</h3><div className="mt-5 flex items-center gap-3 border-b border-stone-100 pb-4"><div className="grid h-12 w-12 place-items-center rounded-xl bg-brand-light text-2xl">🎁</div><div className="flex-1"><div className="text-sm font-semibold">Handcrafted selection</div><div className="mt-1 text-xs text-stone-400">Qty 1 · Sample line item</div></div><div className="text-sm font-semibold">₹{order.total.toLocaleString("en-IN")}</div></div><h3 className="mt-6 font-bold">Customer</h3><p className="mt-2 text-sm text-stone-600">{order.customer}</p><p className="mt-1 text-xs text-stone-400">Customer address and contact details are not configured in this demo.</p></section><aside className="h-fit rounded-2xl border border-stone-200 bg-white p-6 shadow-soft"><h3 className="font-bold">Order summary</h3><div className="mt-5 flex justify-between text-sm"><span className="text-stone-500">Payment</span><StatusBadge status={order.payment}/></div><div className="mt-4 flex justify-between text-sm"><span className="text-stone-500">Fulfillment</span><StatusBadge status={order.status}/></div><div className="mt-5 border-t border-stone-100 pt-4"><div className="flex justify-between text-sm"><span className="text-stone-500">Total</span><strong>₹{order.total.toLocaleString("en-IN")}</strong></div></div><button onClick={()=>alert("Order status updates require a connected backend.")} className="mt-5 w-full rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white">Update order status</button></aside></div></div>;
+}
